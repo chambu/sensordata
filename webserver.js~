@@ -1,0 +1,101 @@
+// Modules
+var express = require('express');
+var path = require('path');
+var request = require('request');
+ 
+// Create app
+var app = express();
+var port = 3001;
+
+cores = {
+  sensor_core: '50ff6f065067545626270287'
+};
+ 
+// Token
+access_token = '28a99d0b36e8e1143b38be6502d12d476ede7927';
+
+// City
+
+city =  'waltham,usa';
+
+// Base address
+address = 'https://api.spark.io/v1/devices/';
+weather_address = 'http://api.openweathermap.org/data/2.5/weather?q='
+
+// Set views
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'views')));
+
+// Serve files
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/views/interface.html')
+});
+
+// API access
+app.get("/get", function(req, res){
+	  
+  // Request options
+  var options = {timeout: 6000, json: true};
+      
+    // Make request
+    command = address + cores[req.query['core']] + req.query['command'] + '?access_token=' + access_token ;
+    request(command, options, function (error, response, body) {
+    if (!error){
+//      console.log(body);
+      res.json(body);  
+    }
+    else {
+      console.log("Core offline");
+      res.json({coreInfo: {connected: false}}); 
+    }
+  });
+});
+
+// API access
+app.get("/getweather", function(req, res){
+	  
+  // Request options
+  var options = {timeout: 6000, json: true};
+      
+    // Make request
+    command = weather_address + city ;
+//    console.log("weather post" + command);
+    request(command, options, function (error, response, body) {
+    if (!error){
+      console.log(body);
+      res.json(body);  
+    }
+    else {
+      console.log("Weather offline");
+//      res.json({coreInfo: {connected: false}}); 
+    }
+  });
+});
+
+app.get("/post", function(req, res){
+
+  // Command
+  command = address + cores[req.query['core']] + req.query['command'];
+//    console.log("web post" + command);	  
+  // Make request
+  request(command, 
+    {headers: {'Content-type': 'application/x-www-form-urlencoded'},
+      method: 'POST', 
+      json: true,
+      body: "access_token=" + access_token + "&args=" + req.query['params'],
+      timeout: 5000}, function (error, response, body) {
+    if (!error){
+//      console.log(body);
+      res.json(body);  
+    }
+    else {
+      console.log("Core offline");
+      res.json({coreInfo: {connected: false}});
+    }
+  });
+});
+
+// Start server
+app.listen(port);
+console.log("Listening on port " + port);
+

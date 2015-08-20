@@ -1,0 +1,20 @@
+{
+  "name": "weather-app",
+  "preferGlobal": true,
+  "version": "0.0.1",
+  "author": "Gowtham ",
+  "description": "a simple web",
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10"
+  },
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "dependencies": {
+    "express": "~4.2.0",
+    "json-lint": "~0.1.0",
+    "moment": "~2.10.6",
+    "mongodb": "~2.0.42"
+  }
+}
